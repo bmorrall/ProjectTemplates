@@ -15,6 +15,7 @@
 /tmp
 
 # Ignore Typical Rails App
+.rspec
 Gemfile
 Gemfile.lock
 Rakefile
