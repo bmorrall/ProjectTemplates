@@ -1,4 +1,5 @@
-<%%- model_class = <%= singular_table_name.classify %> -%>
+<%- singular_var_name = singular_table_name.split('_')[-1] -%>
+<%%- model_class = <%= singular_table_name.split('_')[-1].classify %> -%>
 <div class="page-header">
   <h1><%%=t '.title', :default => model_class.model_name.human %></h1>
 </div>
@@ -6,20 +7,20 @@
 <dl class="dl-horizontal">
 <%- attributes.each do |attribute| -%>
   <dt><strong><%%= model_class.human_attribute_name(:<%= attribute.name %>) %>:</strong></dt>
-  <dd><%%= @<%= singular_table_name %>.<%= attribute.name %> %></dd>
+  <dd><%%= @<%= singular_var_name %>.<%= attribute.name %> %></dd>
 <%- end -%>
 </dl>
 
 <div class="form-actions">
   <%%= link_to t('.back', :default => t("helpers.links.back")),
               <%= index_helper %>_path, :class => 'btn'  %>
-  <%% if can? :update, @<%= singular_table_name %> %>
+  <%% if can? :update, @<%= singular_var_name %> %>
     <%%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_<%= singular_table_name %>_path(@<%= singular_table_name %>), :class => 'btn' %>
+              edit_<%= singular_table_name %>_path(@<%= singular_var_name %>), :class => 'btn' %>
   <%% end %>
-  <%% if can? :destroy, @<%= singular_table_name %> %>
+  <%% if can? :destroy, @<%= singular_var_name %> %>
     <%%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-              <%= singular_table_name %>_path(@<%= singular_table_name %>),
+              <%= singular_table_name %>_path(@<%= singular_var_name %>),
               :method => 'delete',
               :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
               :class => 'btn btn-danger' %>

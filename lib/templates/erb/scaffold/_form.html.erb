@@ -1,4 +1,6 @@
-<%%= simple_form_for(@<%= singular_table_name %>, :html => { class: 'form-horizontal' }) do |f| %>
+<%- singular_var_name = singular_table_name.split('_')[-1] -%>
+<%- form_object_vars = singular_var_name == singular_table_name ? "@#{singular_var_name}" : "[:#{singular_table_name.split('_')[0..-2].join(', :')}, @#{singular_var_name}]" -%>
+<%%= simple_form_for(<%= form_object_vars %>, :html => { class: 'form-horizontal' }) do |f| %>
   <%%= f.error_notification %>
 
   <div class="form-inputs">
