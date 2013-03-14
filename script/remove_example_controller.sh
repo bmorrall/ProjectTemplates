@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Rollback changes to Database
+rake db:rollback
+
 # Remove Assets
 rm app/assets/javascripts/examples.js.coffee
 rm app/assets/stylesheets/examples.css.scss
