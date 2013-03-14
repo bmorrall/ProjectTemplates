@@ -3,3 +3,9 @@
 .control-group.date select {
   width: auto;
 }
+
+table td.id-column {
+  font-family: $monoFontFamily;
+  text-align: right;
+  width: 50px;
+}
