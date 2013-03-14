@@ -9,3 +9,16 @@ table td.id-column {
   text-align: right;
   width: 50px;
 }
+
+@media (max-width: 767px) {
+    .table td.id-column {
+      padding: 8px; // Preserve Padding
+    }
+    .table td.title-column {
+      padding: 0;
+    }
+    .table td.title-column a {
+      display: block;
+      padding: 8px;
+    }
+}
