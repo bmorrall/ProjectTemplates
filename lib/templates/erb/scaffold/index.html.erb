@@ -18,9 +18,12 @@
   <tbody>
     <%% @<%= plural_var_name %>.each do |<%= singular_var_name %>| %>
       <tr>
-        <td class="id-column"><%%= link_to <%= singular_var_name %>.id, <%= singular_table_name %>_path(<%= singular_var_name %>) %></td>
-        <%- attributes.each do |attribute| -%>
+        <td class="id-column"><%%= <%= singular_var_name %>.id %></td>
+        <%- if attributes.any? -%>
+        <td><%%= link_to <%= singular_var_name %>.<%= attributes[0].name %>, <%= singular_table_name %>_path(<%= singular_var_name %>) %></td>
+        <%- attributes[1..-1].each do |attribute| -%>
         <td><%%= <%= singular_var_name %>.<%= attribute.name %> %></td>
+        <%- end -%>
         <%- end -%>
         <td><%%=l <%= singular_var_name %>.created_at %></td>
         <td>
