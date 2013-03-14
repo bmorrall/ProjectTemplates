@@ -4,28 +4,28 @@
 rake db:rollback
 
 # Remove Assets
-rm app/assets/javascripts/examples.js.coffee
-rm app/assets/stylesheets/examples.css.scss
+rm app/assets/javascripts/awesome/examples.js.coffee
+rm app/assets/stylesheets/awesome/examples.css.scss
 
 # Remove Controllers
-rm app/controllers/examples_controller.rb
-rm spec/controllers/examples_controller_spec.rb
+rm app/controllers/awesome/examples_controller.rb
+rm spec/controllers/awesome/examples_controller_spec.rb
 
 # Remove Helpers
-rm app/helpers/examples_helper.rb
-rm spec/helpers/examples_helper_spec.rb
+rm app/helpers/awesome/examples_helper.rb
+rm spec/helpers/awesome/examples_helper_spec.rb
 
 # Remove Models
 rm app/models/example.rb
 rm spec/models/example_spec.rb
 
 # Remove Views
-rm -rf app/views/examples
-rm -rf spec/views/examples
+rm -rf app/views/awesome/examples
+rm -rf spec/views/awesome/examples
 
 # Remove Specs
-rm spec/requests/examples_spec.rb
-rm spec/routing/examples_routing_spec.rb
+rm spec/requests/awesome/awesome_examples_spec.rb
+rm spec/routing/awesome/examples_routing_spec.rb
 
 # Replace Migrations
 rm db/migrate/*.rb
