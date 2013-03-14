@@ -4,7 +4,7 @@
   <h1><%%=t '.title', :default => model_class.model_name.human %></h1>
 </div>
 
-<dl class="dl-horizontal">
+<dl class="dl-horizontal item-summary">
 <%- attributes.each do |attribute| -%>
   <dt><strong><%%= model_class.human_attribute_name(:<%= attribute.name %>) %>:</strong></dt>
   <dd><%%= @<%= singular_var_name %>.<%= attribute.name %> %></dd>
