@@ -235,7 +235,7 @@ describe <%= controller_class_name %>Controller do
           assigns(:<%= file_name %>).should be_persisted
         end
         it "redirects to the created <%= file_name %>" do
-          response.should redirect_to(<%= local_class_name %>.last)
+          response.should redirect_to(<%= ns_file_name %>_path(<%= local_class_name %>.last))
         end
       end
       describe "with invalid params" do
@@ -301,7 +301,7 @@ describe <%= controller_class_name %>Controller do
           assigns(:<%= file_name %>).should eq(@<%= file_name %>)
         end
         it "redirects to the <%= file_name %>" do
-          response.should redirect_to(@<%= file_name %>)
+          response.should redirect_to(<%= ns_file_name %>_path(@<%= file_name %>))
         end
       end
       describe "with invalid params" do
