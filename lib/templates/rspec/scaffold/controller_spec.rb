@@ -101,7 +101,7 @@ describe <%= controller_class_name %>Controller do
           @<%= file_name %> = FactoryGirl.create(:<%= file_name %>)
           get :show, {:id => @<%= file_name %>.to_param}
         end
-        it { should redirect_to(root_url) }
+        it { should redirect_to(<%= index_helper %>_path) }
         it { should set_the_flash[:alert].to("You are not authorized to access this page.") }
       end
     end
