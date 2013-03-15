@@ -91,5 +91,17 @@ class <%= controller_class_name %>Controller < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  protected
+
+  # Capture any access violations, ensure User isn't unnessisarily redirected to root
+  rescue_from CanCan::AccessDenied do |exception|
+    if params[:action] == 'index'
+      redirect_to root_url, :alert => exception.message
+    else
+      redirect_to <%= index_helper %>_url, :alert => exception.message
+    end
+  end
+
 end
 <% end -%>
