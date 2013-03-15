@@ -23,23 +23,15 @@ require 'spec_helper'
 describe <%= controller_class_name %>Controller do
 
   # This should return the minimal set of attributes required to create a valid
-  # <%= local_class_name %>. As you add validations to <%= local_class_name %>, be sure to
-  # update the return value of this method accordingly.
-  def valid_attributes
-    attrs = FactoryGirl.build(:<%= file_name %>).attributes
-    attrs.select { |key,value| <%= local_class_name %>.accessible_attributes.include? key }
-  end
-
-  # This should return the minimal set of attributes required to create a valid
   # <%= local_class_name %>.
   def valid_create_attributes
-    valid_attributes
+    FactoryGirl.attributes_for(:example)
   end
 
   # This should return the minimal set of attributes required to update a valid
   # <%= local_class_name %>.
   def valid_update_attributes
-    valid_attributes
+    FactoryGirl.attributes_for(:example)
   end
 
 <% unless options[:singleton] -%>
