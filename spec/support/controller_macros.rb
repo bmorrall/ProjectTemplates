@@ -18,7 +18,7 @@ module ControllerMacros
       @controller.stubs(:current_ability).returns(@ability)
 
       @request.env["devise.mapping"] = Devise.mappings[:user]
-      @logged_in_admin = FactoryGirl.create(:admin_user)
+      @logged_in_admin = FactoryGirl.create(:user)
       sign_in @logged_in_admin
     end
   end
