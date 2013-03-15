@@ -19,24 +19,25 @@ require 'spec_helper'
 # that an instance is receiving a specific message.
 
 <% module_namespacing do -%>
+<%- local_class_name = class_name.split("::")[-1] -%>
 describe <%= controller_class_name %>Controller do
 
   # This should return the minimal set of attributes required to create a valid
-  # <%= class_name %>. As you add validations to <%= class_name %>, be sure to
+  # <%= local_class_name %>. As you add validations to <%= local_class_name %>, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
     attrs = FactoryGirl.build(:<%= file_name %>).attributes
-    attrs.select { |key,value| <%= class_name %>.accessible_attributes.include? key }
+    attrs.select { |key,value| <%= local_class_name %>.accessible_attributes.include? key }
   end
 
   # This should return the minimal set of attributes required to create a valid
-  # <%= class_name %>.
+  # <%= local_class_name %>.
   def valid_create_attributes
     valid_attributes
   end
 
   # This should return the minimal set of attributes required to update a valid
-  # <%= class_name %>.
+  # <%= local_class_name %>.
   def valid_update_attributes
     valid_attributes
   end
@@ -129,7 +130,7 @@ describe <%= controller_class_name %>Controller do
         it { should render_template(:new) }
         it { should render_with_layout(:application) }
         it "assigns a new <%= ns_file_name %> as @<%= ns_file_name %>" do
-          assigns(:<%= ns_file_name %>).should be_a_new(<%= class_name %>)
+          assigns(:<%= ns_file_name %>).should be_a_new(<%= local_class_name %>)
         end
       end
     end
@@ -197,10 +198,10 @@ describe <%= controller_class_name %>Controller do
     context 'as an admin user' do
       login_admin
       describe "with valid params" do
-        it "creates a new <%= class_name %>" do
+        it "creates a new <%= local_class_name %>" do
           expect {
             post :create, {:<%= ns_file_name %> => valid_create_attributes}
-          }.to change(<%= class_name %>, :count).by(1)
+          }.to change(<%= local_class_name %>, :count).by(1)
         end
       end
       describe 'with valid params' do
@@ -208,23 +209,23 @@ describe <%= controller_class_name %>Controller do
           post :create, {:<%= ns_file_name %> => valid_create_attributes}
         end
         it "assigns a newly created <%= ns_file_name %> as @<%= ns_file_name %>" do
-          assigns(:<%= ns_file_name %>).should be_a(<%= class_name %>)
+          assigns(:<%= ns_file_name %>).should be_a(<%= local_class_name %>)
           assigns(:<%= ns_file_name %>).should be_persisted
         end
         it "redirects to the created <%= ns_file_name %>" do
-          response.should redirect_to(<%= class_name %>.last)
+          response.should redirect_to(<%= local_class_name %>.last)
         end
       end
       describe "with invalid params" do
         before(:each) do
           # Trigger the behavior that occurs when invalid params are submitted
-          <%= class_name %>.any_instance.stub(:save).and_return(false)
+          <%= local_class_name %>.any_instance.stub(:save).and_return(false)
           post :create, {:<%= ns_file_name %> => <%= formatted_hash(example_invalid_attributes) %>}
         end
         it { should render_template(:new) }
         it { should render_with_layout(:application) }
         it "assigns a newly created but unsaved <%= ns_file_name %> as @<%= ns_file_name %>" do
-          assigns(:<%= ns_file_name %>).should be_a_new(<%= class_name %>)
+          assigns(:<%= ns_file_name %>).should be_a_new(<%= local_class_name %>)
         end
       end
     end
@@ -258,13 +259,13 @@ describe <%= controller_class_name %>Controller do
         it "updates the requested <%= ns_file_name %>" do
           @<%= file_name %> = FactoryGirl.create(:<%= file_name %>)
           # Assuming there are no other <%= table_name %> in the database, this
-          # specifies that the <%= class_name %> created on the previous line
+          # specifies that the <%= local_class_name %> created on the previous line
           # receives the :update_attributes message with whatever params are
           # submitted in the request.
           <%- if Rails.version >= '4' -%>
-          <%= class_name %>.any_instance.should_receive(:update).with(<%= formatted_hash(example_params_for_update) %>)
+          <%= local_class_name %>.any_instance.should_receive(:update).with(<%= formatted_hash(example_params_for_update) %>)
           <%- else -%>
-          <%= class_name %>.any_instance.should_receive(:update_attributes).with(<%= formatted_hash(example_params_for_update) %>)
+          <%= local_class_name %>.any_instance.should_receive(:update_attributes).with(<%= formatted_hash(example_params_for_update) %>)
           <%- end -%>
           put :update, {:id => @<%= file_name %>.to_param, :<%= ns_file_name %> => <%= formatted_hash(example_params_for_update) %>}
         end
@@ -285,7 +286,7 @@ describe <%= controller_class_name %>Controller do
         before(:each) do
           @<%= file_name %> = FactoryGirl.create(:<%= file_name %>)
           # Trigger the behavior that occurs when invalid params are submitted
-          <%= class_name %>.any_instance.stub(:save).and_return(false)
+          <%= local_class_name %>.any_instance.stub(:save).and_return(false)
           put :update, {:id => @<%= file_name %>.to_param, :<%= ns_file_name %> => <%= formatted_hash(example_invalid_attributes) %>}
         end
         it { should render_template(:edit) }
@@ -325,7 +326,7 @@ describe <%= controller_class_name %>Controller do
         @<%= file_name %> = FactoryGirl.create(:<%= file_name %>)
         expect {
           delete :destroy, {:id => @<%= file_name %>.to_param}
-        }.to change(<%= class_name %>, :count).by(-1)
+        }.to change(<%= local_class_name %>, :count).by(-1)
       end
       describe 'with valid request' do
         before(:each) do
