@@ -45,6 +45,8 @@
   </tbody>
 </table>
 
-<%%= link_to t('.new', :default => t("helpers.links.new")),
+<%% if can?(:create, <%= file_name.classify %>) %>
+  <%%= link_to t('.new', :default => t("helpers.links.new")),
             new_<%= singular_table_name %>_path,
             :class => 'btn btn-primary' %>
+<%% end %>

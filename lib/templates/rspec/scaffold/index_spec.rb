@@ -82,4 +82,28 @@ end
 <% end -%>
   end
 
+  describe 'new <%= file_name %>' do
+    context 'without create permissions' do
+      it "does not render a new <%= file_name %> link" do
+        render
+<% if webrat? -%>
+        rendered.should_not have_selector("a[href=#{new_<%= ns_file_name %>_path}]", :content => "New", :count => 1)
+<% else -%>
+        assert_select "a[href=#{new_<%= ns_file_name %>_path}]", :text => "New", :count => 0
+<% end -%>
+      end
+    end
+    context 'with create permissions' do
+      it "renders a new <%= file_name %> link" do
+        @ability.can :create, <%= local_class_name %>
+        render
+<% if webrat? -%>
+        rendered.should have_selector("a[href=#{new_<%= ns_file_name %>_path}]", :content => "New", :count => 1)
+<% else -%>
+        assert_select "a[href=#{new_<%= ns_file_name %>_path}]", :text => "New", :count => 1
+<% end -%>
+      end
+    end
+  end
+
 end
