@@ -47,9 +47,9 @@ end
 <% end -%>
 <% [1,2].each_with_index do |id, model_index| -%>
 <% if webrat? -%>
-    rendered.should have_selector("table>tr.<%= file_name %>_#{@<%= file_name %>_<%= model_index + 1 %>.id}", :count => 1)
+    rendered.should have_selector("tbody>tr.<%= file_name %>_#{@<%= file_name %>_<%= model_index + 1 %>.id}", :count => 1)
 <% else -%>
-    assert_select "table>tr.<%= file_name %>_#{@<%= file_name %>_<%= model_index + 1 %>.id}", :count => 1
+    assert_select "tbody>tr.<%= file_name %>_#{@<%= file_name %>_<%= model_index + 1 %>.id}", :count => 1
 <% end -%>
 <% end -%>
   end
@@ -81,4 +81,5 @@ end
 <% end -%>
 <% end -%>
   end
+
 end
