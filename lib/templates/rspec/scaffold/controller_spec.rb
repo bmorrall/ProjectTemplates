@@ -25,13 +25,13 @@ describe <%= controller_class_name %>Controller do
   # This should return the minimal set of attributes required to create a valid
   # <%= local_class_name %>.
   def valid_create_attributes
-    FactoryGirl.attributes_for(:example)
+    FactoryGirl.attributes_for(:<%= file_name %>)
   end
 
   # This should return the minimal set of attributes required to update a valid
   # <%= local_class_name %>.
   def valid_update_attributes
-    FactoryGirl.attributes_for(:example)
+    FactoryGirl.attributes_for(:<%= file_name %>)
   end
 
 <% unless options[:singleton] -%>

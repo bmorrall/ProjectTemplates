@@ -2,8 +2,8 @@
 require_dependency "<%= namespaced_file_path %>/application_controller"
 
 <% end -%>
-<%- singular_var_name = singular_table_name.split('_')[-1] -%>
-<%- plural_var_name = plural_table_name.split('_')[-1] -%>
+<%- singular_var_name = file_name -%>
+<%- plural_var_name = file_name.pluralize -%>
 <%- local_class_name = class_name.split("::")[-1] -%>
 <%- orm_instance = Rails::Generators::ActiveModel.new singular_var_name -%>
 <% module_namespacing do -%>
