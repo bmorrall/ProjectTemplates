@@ -40,6 +40,17 @@ end
     controller.stub(:current_ability) { @ability }
   end
 
+  describe "page header" do
+    it 'includes a h1 title' do
+      render
+<% if webrat? -%>
+      rendered.should have_selector(".page-header>h1", :content => <%= file_name.humanize.pluralize.dump %>, :count => 1)
+<% else -%>
+      assert_select ".page-header>h1", :text => <%= file_name.humanize.pluralize.dump %>, :count => 1
+<% end -%>
+    end
+  end
+
   describe "<%= file_name.pluralize %> table" do
     it 'includes a row for each <%= file_name %>' do
       render
