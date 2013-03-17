@@ -152,9 +152,9 @@ end
       it "does not render a link to new_<%= ns_file_name %>_path" do
         render
 <% if webrat? -%>
-        rendered.should_not have_selector("a[href=#{new_<%= ns_file_name %>_path}]", :content => "New", :count => 1)
+        rendered.should_not have_selector("a[href=?]", :href => new_<%= ns_file_name %>_path, :count => 1)
 <% else -%>
-        assert_select "a[href=#{new_<%= ns_file_name %>_path}]", :text => "New", :count => 0
+        assert_select "a[href=?]", new_<%= ns_file_name %>_path, :count => 0
 <% end -%>
       end
     end
@@ -163,9 +163,9 @@ end
         @ability.can :create, <%= local_class_name %>
         render
 <% if webrat? -%>
-        rendered.should have_selector("a[href=#{new_<%= ns_file_name %>_path}]", :content => "New", :count => 1)
+        rendered.should have_selector("a[href=?]", new_<%= ns_file_name %>_path, :count => 1)
 <% else -%>
-        assert_select "a[href=#{new_<%= ns_file_name %>_path}]", :text => "New", :count => 1
+        assert_select "a[href=?]", new_<%= ns_file_name %>_path, :count => 1
 <% end -%>
       end
     end
