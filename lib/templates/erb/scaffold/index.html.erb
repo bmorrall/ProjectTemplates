@@ -30,7 +30,7 @@
         <%- end -%>
         <%- end -%>
         <td><%%=l <%= singular_var_name %>.created_at %></td>
-        <td>
+        <td class="table-actions">
           <%%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_<%= singular_table_name %>_path(<%= singular_var_name %>), :class => 'btn btn-mini', :disabled => !can?(:update, <%= singular_var_name %>) %>
           <%%= link_to t('.destroy', :default => t("helpers.links.destroy")),

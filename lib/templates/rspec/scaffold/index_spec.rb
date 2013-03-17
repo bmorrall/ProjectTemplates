@@ -82,9 +82,65 @@ end
 <% end -%>
   end
 
-  describe 'new <%= file_name %>' do
+  describe 'edit <%= file_name %> link' do
+    context 'without update permissions' do
+      it "renders a disabled link to edit_<%= ns_file_name %>_path" do
+        render
+<% [1,2].each_with_index do |id, model_index| -%>
+<% if webrat? -%>
+        rendered.should_not have_selector("a[href][disabled=disabled]", :href => edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index + 1 %>), :count => 1)
+<% else -%>
+        assert_select "a[href=?][disabled=disabled]", edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index + 1 %>), :count => 1
+<% end -%>
+<% end -%>
+      end
+    end
+    context 'with update permissions' do
+      it "renders a link to update<%= ns_file_name %>_path" do
+        @ability.can :update, <%= local_class_name %>
+        render
+<% [1,2].each_with_index do |id, model_index| -%>
+<% if webrat? -%>
+        rendered.should have_selector("a[href]:not([disabled])", :href => edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index + 1 %>), :count => 1)
+<% else -%>
+        assert_select "a[href=?]:not([disabled])", edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index + 1 %>), :count => 1
+<% end -%>
+<% end -%>
+      end
+    end
+  end
+
+  describe 'destroy <%= file_name %> link' do
+    context 'without destroy permissions' do
+      it "renders a disabled link to <%= ns_file_name %>_path" do
+        render
+<% [1,2].each_with_index do |id, model_index| -%>
+<% if webrat? -%>
+        rendered.should_not have_selector("a[href][data-method=delete][disabled=disabled]", :href => <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index + 1 %>), :count => 1)
+<% else -%>
+        assert_select "a[href=?][data-method=delete][disabled=disabled]", <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index + 1 %>), :count => 1
+<% end -%>
+<% end -%>
+      end
+    end
+    context 'with destroy permissions' do
+      it "renders a link to <%= ns_file_name %>_path" do
+        @ability.can :destroy, <%= local_class_name %>
+        render
+<% [1,2].each_with_index do |id, model_index| -%>
+<% if webrat? -%>
+        rendered.should have_selector("a[href][data-method=delete]:not([disabled])", :href => <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index + 1 %>), :count => 1)
+<% else -%>
+        assert_select "a[href=?][data-method=delete]:not([disabled])", <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index + 1 %>), :count => 1
+<% end -%>
+<% end -%>
+      end
+    end
+  end
+
+  describe 'new <%= file_name %> link' do
     context 'without create permissions' do
-      it "does not render a new <%= file_name %> link" do
+      it "does not render a link to new_<%= ns_file_name %>_path" do
         render
 <% if webrat? -%>
         rendered.should_not have_selector("a[href=#{new_<%= ns_file_name %>_path}]", :content => "New", :count => 1)
@@ -94,7 +150,7 @@ end
       end
     end
     context 'with create permissions' do
-      it "renders a new <%= file_name %> link" do
+      it "renders a link to new_<%= ns_file_name %>_path" do
         @ability.can :create, <%= local_class_name %>
         render
 <% if webrat? -%>
