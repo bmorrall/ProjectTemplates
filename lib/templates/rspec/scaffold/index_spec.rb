@@ -40,30 +40,31 @@ end
     controller.stub(:current_ability) { @ability }
   end
 
-  it 'renders a table rows with <%= file_name %> classes' do
-    render
+  describe "<%= file_name.pluralize %> table" do
+    it 'includes a row for each <%= file_name %>' do
+      render
 <% unless webrat? -%>
-    # Run the generator again with the --webrat flag if you want to use webrat matchers
+      # Run the generator again with the --webrat flag if you want to use webrat matchers
 <% end -%>
 <% [1,2].each do |model_index| -%>
 <% if webrat? -%>
-    rendered.should have_selector("tbody>tr.<%= file_name %>_#{@<%= file_name %>_<%= model_index %>.id}", :count => 1)
+      rendered.should have_selector("table>tbody>tr.<%= file_name %>_#{@<%= file_name %>_<%= model_index %>.id}", :count => 1)
 <% else -%>
-    assert_select "tbody>tr.<%= file_name %>_#{@<%= file_name %>_<%= model_index %>.id}", :count => 1
+      assert_select "table>tbody>tr.<%= file_name %>_#{@<%= file_name %>_<%= model_index %>.id}", :count => 1
 <% end -%>
 <% end -%>
-  end
+    end
 
-  it "renders a list of <%= file_name.pluralize %>" do
-    render
+    it "contains a list of <%= file_name.pluralize %>" do
+      render
 <% unless webrat? -%>
-    # Run the generator again with the --webrat flag if you want to use webrat matchers
+      # Run the generator again with the --webrat flag if you want to use webrat matchers
 <% end -%>
 <% [1,2].each do |model_index| -%>
 <% if webrat? -%>
-    rendered.should have_selector("tr>td.id-column", :content => @<%= file_name %>_<%= model_index %>.id.to_s, :count => 1)
+      rendered.should have_selector("tr>td.id-column", :content => @<%= file_name %>_<%= model_index %>.id.to_s, :count => 1)
 <% else -%>
-    assert_select "tr>td.id-column", :text => @<%= file_name %>_<%= model_index %>.id.to_s, :count => 1
+      assert_select "tr>td.id-column", :text => @<%= file_name %>_<%= model_index %>.id.to_s, :count => 1
 <% end -%>
 <% end -%>
 <% output_attributes.each_with_index do |attribute, attribute_index| -%>
@@ -82,65 +83,66 @@ else
 end
 -%>
 <% if webrat? -%>
-    rendered.should have_selector("tr>td<% if attribute_index == 0 %>>a<% end %>", :content => <%= attribute_value %>.to_s, :count => 2)
+      rendered.should have_selector("tr>td<% if attribute_index == 0 %>>a<% end %>", :content => <%= attribute_value %>.to_s, :count => 2)
 <% else -%>
-    assert_select "tr>td<% if attribute_index == 0 %>>a<% end %>", :text => <%= attribute_value %>.to_s, :count => 2
+      assert_select "tr>td<% if attribute_index == 0 %>>a<% end %>", :text => <%= attribute_value %>.to_s, :count => 2
 <% end -%>
 <% end -%>
-  end
+    end
 
-  describe 'edit <%= file_name %> link' do
-    context 'without update permissions' do
-      it "renders a disabled link to edit_<%= ns_file_name %>_path" do
-        render
+    describe 'edit <%= file_name %> link' do
+      context 'without update permissions' do
+        it "renders a disabled link to edit_<%= ns_file_name %>_path" do
+          render
 <% [1,2].each do |model_index| -%>
 <% if webrat? -%>
-        rendered.should_not have_selector("a[href][disabled=disabled]", :href => edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1)
+          rendered.should_not have_selector("td>a[href][disabled=disabled]", :href => edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1)
 <% else -%>
-        assert_select "a[href=?][disabled=disabled]", edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1
+          assert_select "td>a[href=?][disabled=disabled]", edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1
 <% end -%>
 <% end -%>
+        end
       end
-    end
-    context 'with update permissions' do
-      it "renders a link to edit_<%= ns_file_name %>_path" do
-        @ability.can :update, <%= local_class_name %>
-        render
+      context 'with update permissions' do
+        it "renders a link to edit_<%= ns_file_name %>_path" do
+          @ability.can :update, <%= local_class_name %>
+          render
 <% [1,2].each do |model_index| -%>
 <% if webrat? -%>
-        rendered.should have_selector("a[href]:not([disabled])", :href => edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1)
+          rendered.should have_selector("td>a[href]:not([disabled])", :href => edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1)
 <% else -%>
-        assert_select "a[href=?]:not([disabled])", edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1
+          assert_select "td>a[href=?]:not([disabled])", edit_<%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1
 <% end -%>
 <% end -%>
+        end
       end
     end
-  end
 
-  describe 'destroy <%= file_name %> link' do
-    context 'without destroy permissions' do
-      it "renders a disabled link to <%= ns_file_name %>_path" do
-        render
+    describe 'destroy <%= file_name %> link' do
+      context 'without destroy permissions' do
+        it "renders a disabled link to <%= ns_file_name %>_path" do
+          render
 <% [1,2].each do |model_index| -%>
 <% if webrat? -%>
-        rendered.should_not have_selector("a[href][data-method=delete][disabled=disabled]", :href => <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1)
+          rendered.should_not have_selector("td>a[href][data-method=delete][disabled=disabled]", :href => <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1)
 <% else -%>
-        assert_select "a[href=?][data-method=delete][disabled=disabled]", <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1
+          assert_select "td>a[href=?][data-method=delete][disabled=disabled]", <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1
 <% end -%>
 <% end -%>
+        end
       end
-    end
-    context 'with destroy permissions' do
-      it "renders a link to <%= ns_file_name %>_path" do
-        @ability.can :destroy, <%= local_class_name %>
-        render
+      context 'with destroy permissions' do
+        it "renders a link to <%= ns_file_name %>_path" do
+          @ability.can :destroy, <%= local_class_name %>
+          render
 <% [1,2].each do |model_index| -%>
 <% if webrat? -%>
-        rendered.should have_selector("a[href][data-method=delete]:not([disabled])", :href => <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1)
+          rendered.should have_selector("td>a[href][data-method=delete]:not([disabled])", :href => <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1)
 <% else -%>
-        assert_select "a[href=?][data-method=delete]:not([disabled])", <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1
+          assert_select "td>a[href=?][data-method=delete]:not([disabled])", <%= ns_file_name %>_path(@<%= file_name %>_<%= model_index %>), :count => 1
 <% end -%>
 <% end -%>
+        end
       end
     end
   end
