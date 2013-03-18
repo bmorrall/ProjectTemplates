@@ -3,8 +3,10 @@ ProjectTemplates::Application.routes.draw do
   devise_for :users
 
   namespace :awesome do
-    resources :examples
+    resources :foo_bars
   end
+
+  root :to => 'awesome/foo_bars#index'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
