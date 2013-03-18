@@ -34,6 +34,10 @@ Rakefile
 /log
 /script/rails
 /spec/controllers
+/spec/helpers
+/spec/factories
 /spec/models
+/spec/requests
+/spec/routing
 /vendor
 /spec/views
