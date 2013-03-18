@@ -4,8 +4,10 @@ dl.item-summary dd {
 }
 
 // Bootstrap/SimpleForm date input is three select fields
-.control-group.date select {
-  width: auto;
+.date, .time, .datetime {
+  &.control-group select {
+    width: auto;
+  }
 }
 
 // http://jasny.github.com/bootstrap/
