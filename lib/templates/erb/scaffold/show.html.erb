@@ -1,5 +1,5 @@
-<%- singular_var_name = singular_table_name.split('_')[-1] -%>
-<%%- model_class = <%= singular_table_name.split('_')[-1].classify %> -%>
+<%- singular_var_name = file_name -%>
+<%%- model_class = <%= file_name.classify %> -%>
 <div class="page-header">
   <h1><%%=t '.title', :default => model_class.model_name.human %></h1>
 </div>
@@ -7,7 +7,13 @@
 <dl class="dl-horizontal item-summary">
 <%- attributes.each do |attribute| -%>
   <dt><strong><%%= model_class.human_attribute_name(:<%= attribute.name %>) %>:</strong></dt>
+  <%- if [:datetime, :timestamp, :time, :date].include? attribute.type -%>
+  <%% unless @<%= singular_var_name %>.nil? %>
+  <dd><%%=l @<%= singular_var_name %>.<%= attribute.name %><% if attribute.type == :datetime %>, :format => :long<% end %><% if attribute.type == :time %>, :format => :short<% end %> %></dd>
+  <%% end %>
+  <%- else -%>
   <dd><%%= @<%= singular_var_name %>.<%= attribute.name %> %></dd>
+  <%- end -%>
 <%- end -%>
 </dl>
 
