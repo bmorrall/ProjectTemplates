@@ -2,8 +2,8 @@
 require_dependency "<%= namespaced_file_path %>/application_controller"
 
 <% end -%>
-<%- singular_var_name = singular_table_name.split('_')[-1] -%>
-<%- plural_var_name = plural_table_name.split('_')[-1] -%>
+<%- singular_var_name = file_name -%>
+<%- plural_var_name = file_name.pluralize -%>
 <%- local_class_name = class_name.split("::")[-1] -%>
 <%- orm_instance = Rails::Generators::ActiveModel.new singular_var_name -%>
 <% module_namespacing do -%>
@@ -91,5 +91,17 @@ class <%= controller_class_name %>Controller < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  protected
+
+  # Capture any access violations, ensure User isn't unnessisarily redirected to root
+  rescue_from CanCan::AccessDenied do |exception|
+    if params[:action] == 'index'
+      redirect_to root_url, :alert => exception.message
+    else
+      redirect_to <%= index_helper %>_url, :alert => exception.message
+    end
+  end
+
 end
 <% end -%>
