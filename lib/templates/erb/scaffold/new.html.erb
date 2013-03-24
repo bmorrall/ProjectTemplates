@@ -1,4 +1,6 @@
 <%%- model_class = <%= file_name.classify %> -%>
+<%%- add_breadcrumb :index, <%= index_helper %>_url -%>
+<%%- add_breadcrumb :new, new_<%= singular_table_name %>_url -%>
 <div class="page-header">
   <h1><%%=t '.title', :default => [:'helpers.titles.new', 'New %{model}'], :model => model_class.model_name.human %></h1>
 </div>
