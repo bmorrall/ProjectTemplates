@@ -2,13 +2,41 @@
 require_dependency "<%= namespaced_file_path %>/application_controller"
 
 <% end -%>
-<%- singular_var_name = file_name -%>
-<%- plural_var_name = file_name.pluralize -%>
-<%- local_class_name = class_name.split("::")[-1] -%>
-<%- orm_instance = Rails::Generators::ActiveModel.new singular_var_name -%>
+<%-
+
+PARENT_MODEL = [] # i.e. ['User', 'Category'] for user_category_examples_path(@user, @category)
+
+local_class_name = local_class_name = class_name.split("::")[-1] # Non-Namespaced class name
+var_name = file_name # Non-namespaced variable name
+plural_var_name = var_name.pluralize # Pluralized non-namespaced variable name
+
+orm_instance = Rails::Generators::ActiveModel.new var_name
+
+# Determine namespace prefix i.e awesome_
+namespace_prefix = singular_table_name[0..-(file_name.length + 1)]
+
+# Determine Parent Prefix i.e. user_company
+parent_prefix = PARENT_MODEL.collect{ |x| x.underscore }.join('_')
+parent_prefix = "#{parent_prefix}_" unless parent_prefix.blank?
+
+# Route Prefix i.e. awesome_user_company
+route_prefix = namespace_prefix + parent_prefix
+
+parent_variables = PARENT_MODEL.collect { |x| "@#{x.underscore}" }.join(', ')
+
+# Route Helpers
+route_params_prefix = parent_variables.blank? ? "" : "#{parent_variables}, "
+index_path_prefix = "#{route_prefix}#{plural_var_name}"
+single_path_prefix = "#{route_prefix}#{var_name}"
+controller_index_route = "#{index_path_prefix}_url(#{parent_variables})"
+
+-%>
 <% module_namespacing do -%>
 class <%= controller_class_name %>Controller < ApplicationController
-  load_and_authorize_resource
+  <%- PARENT_MODEL.each_with_index do |model, model_index| -%>
+  load_resource :<%= model.underscore %><% if model_index > 0 %>, :through => :<%= PARENT_MODEL[model_index - 1].underscore %><% end %>
+  <%- end -%>
+  load_and_authorize_resource :<%= var_name%><% if PARENT_MODEL.any? %>, :through => :<%= PARENT_MODEL.last.underscore %><% end %>
 
   # GET <%= route_url %>
   # GET <%= route_url %>.json
@@ -24,39 +52,39 @@ class <%= controller_class_name %>Controller < ApplicationController
   # GET <%= route_url %>/1
   # GET <%= route_url %>/1.json
   def show
-    # @<%= singular_var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
+    # @<%= var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render <%= key_value :json, "@#{singular_var_name}" %> }
+      format.json { render <%= key_value :json, "@#{var_name}" %> }
     end
   end
 
   # GET <%= route_url %>/new
   # GET <%= route_url %>/new.json
   def new
-    # @<%= singular_var_name %> = <%= orm_class.build(local_class_name) %>
+    # @<%= var_name %> = <%= orm_class.build(local_class_name) %>
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render <%= key_value :json, "@#{singular_var_name}" %> }
+      format.json { render <%= key_value :json, "@#{var_name}" %> }
     end
   end
 
   # GET <%= route_url %>/1/edit
   def edit
-    # @<%= singular_var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
+    # @<%= var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
   end
 
   # POST <%= route_url %>
   # POST <%= route_url %>.json
   def create
-    # @<%= singular_var_name %> = <%= orm_class.build(local_class_name, "params[:#{singular_var_name}]") %>
+    # @<%= var_name %> = <%= orm_class.build(local_class_name, "params[:#{var_name}]") %>
 
     respond_to do |format|
       if @<%= orm_instance.save %>
-        format.html { redirect_to <%= singular_table_name %>_path(@<%= singular_var_name %>), <%= key_value :notice, "'#{human_name} was successfully created.'" %> }
-        format.json { render <%= key_value :json, "@#{singular_var_name}" %>, <%= key_value :status, ':created' %>, <%= key_value :location, "#{singular_table_name}_path(@#{singular_var_name})" %> }
+        format.html { redirect_to <%= "#{single_path_prefix}_path(#{route_params_prefix}@#{var_name})" %>, <%= key_value :notice, "'#{human_name} was successfully created.'" %> }
+        format.json { render <%= key_value :json, "@#{var_name}" %>, <%= key_value :status, ':created' %>, <%= key_value :location, "#{single_path_prefix}_path(#{route_params_prefix}@#{var_name})" %> }
       else
         format.html { render <%= key_value :action, '"new"' %> }
         format.json { render <%= key_value :json, "@#{orm_instance.errors}" %>, <%= key_value :status, ':unprocessable_entity' %> }
@@ -67,11 +95,11 @@ class <%= controller_class_name %>Controller < ApplicationController
   # PUT <%= route_url %>/1
   # PUT <%= route_url %>/1.json
   def update
-    # @<%= singular_var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
+    # @<%= var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
 
     respond_to do |format|
-      if @<%= orm_instance.update_attributes("params[:#{singular_var_name}]") %>
-        format.html { redirect_to <%= singular_table_name %>_path(@<%= singular_var_name %>), <%= key_value :notice, "'#{human_name} was successfully updated.'" %> }
+      if @<%= orm_instance.update_attributes("params[:#{var_name}]") %>
+        format.html { redirect_to <%= "#{single_path_prefix}_path(#{route_params_prefix}@#{var_name})" %>, <%= key_value :notice, "'#{human_name} was successfully updated.'" %> }
         format.json { head :no_content }
       else
         format.html { render <%= key_value :action, '"edit"' %> }
@@ -83,11 +111,11 @@ class <%= controller_class_name %>Controller < ApplicationController
   # DELETE <%= route_url %>/1
   # DELETE <%= route_url %>/1.json
   def destroy
-    # @<%= singular_var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
+    # @<%= var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
     @<%= orm_instance.destroy %>
 
     respond_to do |format|
-      format.html { redirect_to <%= index_helper %>_url }
+      format.html { redirect_to <%= controller_index_route %> }
       format.json { head :no_content }
     end
   end
@@ -99,7 +127,7 @@ class <%= controller_class_name %>Controller < ApplicationController
     if params[:action] == 'index'
       redirect_to root_url, :alert => exception.message
     else
-      redirect_to <%= index_helper %>_url, :alert => exception.message
+      redirect_to <%= controller_index_route %>, :alert => exception.message
     end
   end
 

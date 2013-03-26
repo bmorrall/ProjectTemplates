@@ -1,9 +1,9 @@
-<%%- model_class = <%= file_name.classify %> -%>
-<%%- add_breadcrumb :index, <%= index_helper %>_url -%>
-<% if attributes.any? -%>
-<%%- add_breadcrumb @<%= file_name %>.<%= attributes[0].name %>, <%= singular_table_name %>_url(@<%= file_name %>) -%>
-<% end -%>
-<%%- add_breadcrumb :edit, edit_<%= singular_table_name %>_url(@<%= file_name %>) -%>
+<%-
+
+local_class_name = file_name.classify # Non-Namespaced class name
+
+-%>
+<%%- model_class = <%= local_class_name %> -%>
 <div class="page-header">
   <h1><%%=t '.title', :default => [:'helpers.titles.edit', 'Edit %{model}'], :model => model_class.model_name.human %></h1>
 </div>
