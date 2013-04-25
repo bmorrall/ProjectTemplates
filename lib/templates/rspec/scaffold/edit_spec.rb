@@ -25,13 +25,14 @@ describe "<%= ns_table_name %>/edit" do
 <%- end -%>
     @<%= var_name %> = assign(:<%= var_name %>, FactoryGirl.build_stubbed(:<%= var_name %><%= output_attributes.empty? ? '))' : ',' %>
 <% output_attributes.each_with_index do |attribute, attribute_index| -%>
-      :<%= attribute.name %> => <%= t_helper.factory_attribute_value attribute.name, attribute.type, value_for(attribute) %><%= attribute_index == output_attributes.length - 1 ? '' : ','%>
+      :<%= attribute.name %> => <%= t_helper.factory_attribute_value attribute.type, value_for(attribute) %><%= attribute_index == output_attributes.length - 1 ? '' : ','%>
 <% end -%>
 <%= output_attributes.empty? ? "" : "    ))\n" -%>
   end
 
   context do # Within default nesting
     before(:each) do
+      # Add Properties for default view scope
 <%- AuthorizedRailsScaffolds.parent_models.each do |model| -%>
       assign(:<%= model.underscore %>, @<%= model.underscore %>)
 <%- end -%>

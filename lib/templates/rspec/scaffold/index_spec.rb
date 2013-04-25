@@ -25,7 +25,7 @@ describe "<%= ns_table_name %>/index" do
 <% [1,2].each_with_index do |id, model_index| -%>
     @<%= var_name %>_<%= model_index + 1 %> = FactoryGirl.build_stubbed(:<%= var_name %><%= output_attributes.empty? ? ')' : ',' %>
 <% output_attributes.each_with_index do |attribute, attribute_index| -%>
-      :<%= attribute.name %> => <%= t_helper.factory_attribute_value attribute.name, attribute.type, value_for(attribute) %><%= attribute_index == output_attributes.length - 1 ? '' : ','%>
+      :<%= attribute.name %> => <%= t_helper.factory_attribute_value attribute.type, value_for(attribute) %><%= attribute_index == output_attributes.length - 1 ? '' : ','%>
 <% end -%>
 <% if !output_attributes.empty? -%>
     )
@@ -40,6 +40,10 @@ describe "<%= ns_table_name %>/index" do
 
   context do # Within default nesting
     before(:each) do
+      # Add Properties for default view scope
+<%- AuthorizedRailsScaffolds.parent_models.each do |model| -%>
+      assign(:<%= model.underscore %>, @<%= model.underscore %>)
+<%- end -%>
       @ability = Object.new
       @ability.extend(CanCan::Ability)
       controller.stub(:current_ability) { @ability }
@@ -85,9 +89,9 @@ describe "<%= ns_table_name %>/index" do
 <% end -%>
 <% output_attributes.each_with_index do |attribute, attribute_index| -%>
   <%- if webrat? -%>
-        rendered.should have_selector("tr>td", :content => <%= factory_attribute_string attribute.name, attribute.type, value_for(attribute) %>.to_s, :count => 2)
+        rendered.should have_selector("tr>td", :content => <%= factory_attribute_string attribute.type, value_for(attribute) %>.to_s, :count => 2)
   <%- else -%>
-        assert_select "tr>td", :text => <%= t_helper.factory_attribute_string attribute.name, attribute.type, value_for(attribute) %>.to_s, :count => 2
+        assert_select "tr>td", :text => <%= t_helper.factory_attribute_string attribute.type, value_for(attribute) %>.to_s, :count => 2
   <%- end -%>
 <% end -%>
       end

@@ -23,7 +23,7 @@ describe "<%= ns_table_name %>/show" do
 <%- end -%>
     @<%= var_name %> = FactoryGirl.build_stubbed(:<%= var_name %><%= output_attributes.empty? ? ')' : ',' %>
 <% output_attributes.each_with_index do |attribute, attribute_index| -%>
-      :<%= attribute.name %> => <%= t_helper.factory_attribute_value attribute.name, attribute.type, value_for(attribute) %><%= attribute_index == output_attributes.length - 1 ? '' : ','%>
+      :<%= attribute.name %> => <%= t_helper.factory_attribute_value attribute.type, value_for(attribute) %><%= attribute_index == output_attributes.length - 1 ? '' : ','%>
 <% end -%>
 <% if !output_attributes.empty? -%>
     )
@@ -32,6 +32,7 @@ describe "<%= ns_table_name %>/show" do
 
   context do # Within default nesting
     before(:each) do
+      # Add Properties for default view scope
 <%- AuthorizedRailsScaffolds.parent_models.each do |model| -%>
       assign(:<%= model.underscore %>, @<%= model.underscore %>)
 <%- end -%>
@@ -48,10 +49,10 @@ describe "<%= ns_table_name %>/show" do
 <% for attribute in output_attributes -%>
   <%- if webrat? -%>
       rendered.should have_selector("dl>dt", :content => <%= "#{attribute.human_name}:".dump %>)
-      rendered.should have_selector("dl>dd", :content => <%= t_helper.factory_attribute_string attribute.name, attribute.type, value_for(attribute) %>.to_s)
+      rendered.should have_selector("dl>dd", :content => <%= t_helper.factory_attribute_string attribute.type, value_for(attribute) %>.to_s)
   <%- else -%>
       assert_select "dl>dt", :text => <%= "#{attribute.human_name}:".dump %>
-      assert_select "dl>dd", :text => <%= t_helper.factory_attribute_string attribute.name, attribute.type, value_for(attribute) %>.to_s
+      assert_select "dl>dd", :text => <%= t_helper.factory_attribute_string attribute.type, value_for(attribute) %>.to_s
   <%- end -%>
 <% end -%>
     end
