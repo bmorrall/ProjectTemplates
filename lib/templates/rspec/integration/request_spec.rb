@@ -1,59 +1,50 @@
 require 'spec_helper'
 
-<%- local_class_name = class_name.split('::')[-1] -%>
 <%-
-begin
-  local_class = local_class_name.constantize
-  output_attributes = local_class_name.constantize.accessible_attributes.reject { |a| a.blank? }
-rescue NameError
-  local_class = nil
-  output_attributes = []
-end -%>
+
+local_class_name = class_name.split('::')[-1]
+
+parent_parts = []
+AuthorizedRailsScaffolds.parent_models.each do |model|
+  parent_parts << model.underscore
+end
+
+request_path = index_helper[0..-(file_name.length + 2)]
+request_params = ''
+if parent_parts.any?
+  request_path += parent_parts.join('_')
+  request_path += "_"
+  request_params = '(' + parent_parts.join(', ') + ')'
+end
+request_path += file_name
+
+
+-%>
 describe "<%= class_name.pluralize %>" do
-  describe "<%= file_name.humanize.pluralize %> management" do
+  describe "admin <%= local_class_name %> management" do
     before(:each) do
       @user = FactoryGirl.create(:user)
       login_user @user
-      @attributes = FactoryGirl.attributes_for(:<%= file_name %>)
     end
-    it "displays a <%= file_name.humanize %>" do
-      @<%= file_name %> = FactoryGirl.create(:<%= file_name %>)
-      visit <%= index_helper %>_path
-      page.should have_content(@<%= file_name %>.id)
-      click_link @<%= file_name %>.<%= output_attributes[0] %>
 
-      # <%= index_helper.singularize %>_path(<%= file_name %>.id)
-      <%- output_attributes.each do |attribute| -%>
-      page.should have_content("<%= attribute.humanize %>:")
-      <%- end -%>
+    # This should return the minimal set of attributes required to create a valid
+    # <%= local_class_name %>.
+    def valid_create_attributes
+      FactoryGirl.attributes_for(:<%= file_name %>)
     end
-    it "adds a new <%= file_name.humanize %> and displays the results" do
-      visit <%= index_helper %>_path
-      click_link "New"
 
-      # new_<%= index_helper.singularize %>_path
-      <%- output_attributes.each do |attribute| -%>
-      fill_in "<%= attribute.humanize %>", :with => @attributes[:<%= attribute %>].to_s
-      <%- end -%>
-      click_button "Create <%= file_name.humanize %>"
+    it "creates a <%= local_class_name %> and redirects to the <%= local_class_name %>'s page" do
+      get new_<%= request_path.singularize %>_path<%= request_params %>
+      expect(response).to render_template(:new)
 
-      # <%= index_helper.singularize %>_path(<%= file_name %>.id)
-      page.should have_content("<%= file_name.humanize %> was successfully created")
+      post <%= request_path.singularize %>_path<%= request_params %>, :<%= file_name %> => valid_create_attributes
+
+      expect(response).to redirect_to(assigns(:<%= file_name %>))
+      follow_redirect!
+
+      expect(response).to render_template(:show)
+      expect(response.body).to include("<%= local_class_name %> was successfully created.")
     end
-    it "updates an existing <%= file_name.humanize %> and displays the results" do
-      @<%= file_name %> = FactoryGirl.create(:<%= file_name %>)
-      visit <%= index_helper %>_path
-      page.should have_content(@<%= file_name %>.id)
-      click_link "Edit"
 
-      # edit_<%= index_helper.singularize %>_path(<%= file_name %>.id)
-      <%- output_attributes.each do |attribute| -%>
-      fill_in "<%= attribute.humanize %>", :with => @attributes[:<%= attribute %>].to_s
-      <%- end -%>
-      click_button "Update <%= file_name.humanize %>"
-
-      # <%= index_helper.singularize %>_path(<%= file_name %>.id)
-      page.should have_content("<%= file_name.humanize %> was successfully updated")
-    end
   end
 end
