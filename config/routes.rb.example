@@ -3,7 +3,9 @@ ProjectTemplates::Application.routes.draw do
   devise_for :users
 
   namespace :awesome do
-    resources :foo_bars
+    resources :users do
+      resources :foo_bars
+    end
   end
 
   root :to => 'awesome/foo_bars#index'
