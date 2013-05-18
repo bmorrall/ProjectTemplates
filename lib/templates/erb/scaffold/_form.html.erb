@@ -1,17 +1,15 @@
 <%-
 
-t_helper = AuthorizedRailsScaffolds::Helper.new(
+t_helper = AuthorizedRailsScaffolds::RailsErbScaffoldHelper.new(
   :class_name => class_name,
   :singular_table_name => singular_table_name,
   :file_name => file_name
 )
 
-local_class_name = t_helper.local_class_name # Non-Namespaced class name
-var_name = t_helper.var_name # Non-namespaced variable name
-plural_var_name = t_helper.plural_var_name # Pluralized non-namespaced variable name
+resource_var = t_helper.resource_var
 
 -%>
-<%%= simple_form_for(<%= t_helper.form_object_array %>, :html => { class: 'form-horizontal' }) do |f| %>
+<%%= simple_form_for(<%= t_helper.scoped_values_for_form %>, :html => { class: 'form-horizontal' }) do |f| %>
   <%%= f.error_notification %>
 
   <div class="form-inputs">
@@ -23,7 +21,7 @@ plural_var_name = t_helper.plural_var_name # Pluralized non-namespaced variable 
   <div class="form-actions">
     <%%= f.button :submit, :class => 'btn-primary' %>
     <%%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                @<%= var_name %>.persisted? ? <%= t_helper.controller_show_route "@#{var_name}" %> : <%= t_helper.controller_index_path %>,
+                <%= resource_var %>.persisted? ? <%= t_helper.controller_show_route resource_var %> : <%= t_helper.controller_index_path %>,
                 :class => 'btn'
     %>
   </div>

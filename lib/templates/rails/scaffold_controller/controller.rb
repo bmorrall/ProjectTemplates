@@ -4,101 +4,118 @@ require_dependency "<%= namespaced_file_path %>/application_controller"
 <% end -%>
 <%-
 
-t_helper = AuthorizedRailsScaffolds::Helper.new(
+#
+# Available properties:
+# 
+#   class_name
+#   controller_class_name
+#   singular_table_name
+#   file_name
+#   orm_instance
+#   route_url
+#
+
+t_helper = AuthorizedRailsScaffolds::RailsScaffoldControllerHelper.new(
   :class_name => class_name,
+  :controller_class_name => controller_class_name,
   :singular_table_name => singular_table_name,
   :file_name => file_name
 )
 
-local_class_name = t_helper.local_class_name # Non-Namespaced class name
-var_name = t_helper.var_name # Non-namespaced variable name
-plural_var_name = t_helper.plural_var_name # Pluralized non-namespaced variable name
+resource_class = t_helper.resource_class # Non-Namespaced class name
+resource_symbol = t_helper.resource_symbol
+resource_table_name = t_helper.resource_table_name
+resource_plural_name = t_helper.resource_plural_name
+resource_var = t_helper.resource_var
+resources_var = t_helper.resources_var # Pluralized non-namespaced variable name
+
+example_controller_path = t_helper.example_controller_path
 
 # Override default orm instance
-orm_instance = Rails::Generators::ActiveModel.new var_name
+orm_instance = Rails::Generators::ActiveModel.new resource_table_name
 
 -%>
 <% module_namespacing do -%>
-class <%= controller_class_name %>Controller < <%= t_helper.ns_controller_prefix %>ApplicationController
-  <%- AuthorizedRailsScaffolds.parent_models.each_with_index do |model, model_index| -%>
-  load_and_authorize_resource :<%= model.underscore %><% if model_index > 0 %>, :through => :<%= AuthorizedRailsScaffolds.parent_models[model_index - 1].underscore %><% end %>
+class <%= t_helper.controller_class_name %> < <%= t_helper.application_controller_class %>
+  <%- AuthorizedRailsScaffolds.config.parent_models.each_with_index do |model, model_index| -%>
+  load_and_authorize_resource :<%= model.underscore %><% if model_index > 0 %>, :through => :<%= AuthorizedRailsScaffolds.config.parent_models[model_index - 1].underscore %><% end %>
   <%- end -%>
-  load_and_authorize_resource :<%= var_name%><% if AuthorizedRailsScaffolds.parent_models.any? %>, :through => :<%= AuthorizedRailsScaffolds.parent_models.last.underscore %><% end %>
+  load_and_authorize_resource :<%= t_helper.resource_table_name %><% if t_helper.parent_models.any? %>, :through => :<%= t_helper.parent_models.last.underscore %><% end %>
 
-  # GET <%= route_url %>
-  # GET <%= route_url %>.json
+  # GET <%= example_controller_path %>
+  # GET <%= example_controller_path %>.json
   def index
-    # @<%= plural_var_name %> = <%= orm_class.all(local_class_name) %>
+    # <%= resources_var %> = <%= orm_class.all(resource_class) %>
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render <%= key_value :json, "@#{plural_var_name}" %> }
+      format.json { render <%= key_value :json, "{ #{key_value(resource_plural_name, resources_var)} }" %> }
     end
   end
 
-  # GET <%= route_url %>/1
-  # GET <%= route_url %>/1.json
+  # GET <%= example_controller_path %>/1
+  # GET <%= example_controller_path %>/1.json
   def show
-    # @<%= var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
+    # <%= resource_var %> = <%= orm_class.find(resource_class, "params[:id]") %>
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render <%= key_value :json, "@#{var_name}" %> }
+      format.json { render <%= key_value :json, "{ #{key_value(resource_table_name, resource_var)} }" %> }
     end
   end
 
-  # GET <%= route_url %>/new
-  # GET <%= route_url %>/new.json
+  # GET <%= example_controller_path %>/new
+  # GET <%= example_controller_path %>/new.json
   def new
-    # @<%= var_name %> = <%= orm_class.build(local_class_name) %>
+    # <%= resource_var %> = <%= orm_class.build(resource_class) %>
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render <%= key_value :json, "@#{var_name}" %> }
+      format.json { render <%= key_value :json, "{ #{key_value(resource_table_name, resource_var)} }" %> }
     end
   end
 
-  # GET <%= route_url %>/1/edit
+  # GET <%= example_controller_path %>/1/edit
   def edit
-    # @<%= var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
+    # <%= resource_var %> = <%= orm_class.find(resource_class, "params[:id]") %>
   end
 
-  # POST <%= route_url %>
-  # POST <%= route_url %>.json
+  # POST <%= example_controller_path %>
+  # POST <%= example_controller_path %>.json
   def create
-    # @<%= var_name %> = <%= orm_class.build(local_class_name, "params[:#{var_name}]") %>
+    # <%= resource_var %> = <%= orm_class.build(resource_class, "params[#{resource_symbol}]") %>
 
     respond_to do |format|
       if @<%= orm_instance.save %>
-        format.html { redirect_to <%= t_helper.controller_show_route("@#{var_name}") %>, <%= key_value :notice, "'#{human_name} was successfully created.'" %> }
-        format.json { render <%= key_value :json, "@#{var_name}" %>, <%= key_value :status, ':created' %>, <%= key_value :location, t_helper.controller_show_route("@#{var_name}") %> }
+        format.html { redirect_to <%= t_helper.controller_show_route(resource_var) %>, <%= key_value :notice, "'#{human_name} was successfully created.'" %> }
+        format.json { render <%= key_value :json, "{ #{key_value(resource_table_name, resource_var)} }" %>, <%= key_value :status, ':created' %>, <%= key_value :location, t_helper.controller_show_route(resource_var) %> }
       else
         format.html { render <%= key_value :action, '"new"' %> }
-        format.json { render <%= key_value :json, "@#{orm_instance.errors}" %>, <%= key_value :status, ':unprocessable_entity' %> }
+        format.json { render <%= key_value :json, "{ " + key_value('errors', "@#{orm_instance.errors}") + " }" %>, <%= key_value :status, ':unprocessable_entity' %> }
       end
     end
   end
 
-  # PUT <%= route_url %>/1
-  # PUT <%= route_url %>/1.json
+  # PUT <%= example_controller_path %>/1
+  # PUT <%= example_controller_path %>/1.json
   def update
-    # @<%= var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
+    # <%= resource_var %> = <%= orm_class.find(resource_class, "params[:id]") %>
 
     respond_to do |format|
-      if @<%= orm_instance.update_attributes("params[:#{var_name}]") %>
-        format.html { redirect_to <%= t_helper.controller_show_route "@#{var_name}" %>, <%= key_value :notice, "'#{human_name} was successfully updated.'" %> }
+      if @<%= orm_instance.update_attributes("params[#{resource_symbol}]") %>
+        format.html { redirect_to <%= t_helper.controller_show_route resource_var %>, <%= key_value :notice, "'#{human_name} was successfully updated.'" %> }
         format.json { head :no_content }
       else
         format.html { render <%= key_value :action, '"edit"' %> }
-        format.json { render <%= key_value :json, "@#{orm_instance.errors}" %>, <%= key_value :status, ':unprocessable_entity' %> }
+        format.json { render <%= key_value :json, "{ " + key_value('errors', "@#{orm_instance.errors}") + " }" %>, <%= key_value :status, ':unprocessable_entity' %> }
       end
     end
   end
 
-  # DELETE <%= route_url %>/1
-  # DELETE <%= route_url %>/1.json
+  # DELETE <%= example_controller_path %>/1
+  # DELETE <%= example_controller_path %>/1.json
   def destroy
-    # @<%= var_name %> = <%= orm_class.find(local_class_name, "params[:id]") %>
+    # <%= resource_var %> = <%= orm_class.find(resource_class, "params[:id]") %>
     @<%= orm_instance.destroy %>
 
     respond_to do |format|
@@ -112,9 +129,15 @@ class <%= controller_class_name %>Controller < <%= t_helper.ns_controller_prefix
   # Capture any access violations, ensure User isn't unnessisarily redirected to root
   rescue_from CanCan::AccessDenied do |exception|
     if params[:action] == 'index'
-      redirect_to root_url, :alert => exception.message
+      respond_to do |format|
+        format.html { redirect_to root_url, :alert => exception.message }
+        format.json { head :no_content, :status => :forbidden }
+      end
     else
-      redirect_to <%= t_helper.controller_index_route %>, :alert => exception.message
+      respond_to do |format|
+        format.html { redirect_to <%= t_helper.controller_index_route %>, :alert => exception.message }
+        format.json { head :no_content, :status => :forbidden }
+      end
     end
   end
 

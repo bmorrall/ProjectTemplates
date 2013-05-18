@@ -5,7 +5,7 @@ require 'spec_helper'
 local_class_name = class_name.split('::')[-1]
 
 parent_parts = []
-AuthorizedRailsScaffolds.parent_models.each do |model|
+AuthorizedRailsScaffolds.config.parent_models.each do |model|
   parent_parts << model.underscore
 end
 
