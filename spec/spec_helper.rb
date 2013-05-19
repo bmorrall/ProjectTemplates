@@ -40,7 +40,7 @@ end
 RSpec.configure do |config|
   config.include Devise::TestHelpers, :type => :controller
   config.include DeviseCanCanControllerMacros, :type => :controller
-  config.include RequestMacros, :type => :request
+  config.include DeviseCanCanRequestMacros, :type => :request
 
   config.before(:suite) do
     DatabaseCleaner.strategy = :truncation

@@ -11,84 +11,93 @@ require_dependency "<%= namespaced_file_path %>/application_controller"
 #   controller_class_name
 #   singular_table_name
 #   file_name
+#   human_name
 #   orm_instance
 #   route_url
 #
 
 t_helper = AuthorizedRailsScaffolds::RailsScaffoldControllerHelper.new(
   :class_name => class_name,
+  :human_name => human_name,
   :controller_class_name => controller_class_name,
   :singular_table_name => singular_table_name,
   :file_name => file_name
 )
 
 resource_class = t_helper.resource_class # Non-Namespaced class name
+resource_human_name = t_helper.resource_human_name
 resource_symbol = t_helper.resource_symbol
-resource_table_name = t_helper.resource_table_name
-resource_plural_name = t_helper.resource_plural_name
+resource_name = t_helper.resource_name
+resource_array_name = t_helper.resource_array_name
 resource_var = t_helper.resource_var
-resources_var = t_helper.resources_var # Pluralized non-namespaced variable name
+resource_array_var = t_helper.resource_array_var # Pluralized non-namespaced variable name
 
-example_controller_path = t_helper.example_controller_path
+example_index_path = t_helper.example_index_path
+example_show_path = t_helper.example_show_path
 
 # Override default orm instance
-orm_instance = Rails::Generators::ActiveModel.new resource_table_name
+orm_instance = Rails::Generators::ActiveModel.new resource_name
 
 -%>
 <% module_namespacing do -%>
 class <%= t_helper.controller_class_name %> < <%= t_helper.application_controller_class %>
-  <%- AuthorizedRailsScaffolds.config.parent_models.each_with_index do |model, model_index| -%>
-  load_and_authorize_resource :<%= model.underscore %><% if model_index > 0 %>, :through => :<%= AuthorizedRailsScaffolds.config.parent_models[model_index - 1].underscore %><% end %>
+  <%- t_helper.parent_model_names.each_with_index do |model_name, model_index| -%>
+  <%= t_helper.load_and_authorize_parent model_name %>
   <%- end -%>
-  load_and_authorize_resource :<%= t_helper.resource_table_name %><% if t_helper.parent_models.any? %>, :through => :<%= t_helper.parent_models.last.underscore %><% end %>
+  <%= t_helper.load_resource %>
+<%- if t_helper.shallow_routes? -%>
+  before_filter :load_shallow_resources
+<%- end -%>
+  authorize_resource <%= resource_symbol %>
 
-  # GET <%= example_controller_path %>
-  # GET <%= example_controller_path %>.json
+  # GET <%= example_index_path %>
+  # GET <%= example_index_path %>.json
   def index
-    # <%= resources_var %> = <%= orm_class.all(resource_class) %>
+    # <%= resource_array_var %> = <%= orm_class.all(resource_class) %>
+    # <%= resource_array_var %> = <%= resource_array_var %>.page(params[:page] || 1)
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render <%= key_value :json, "{ #{key_value(resource_plural_name, resources_var)} }" %> }
+      format.json { render <%= key_value :json, "{ #{key_value(resource_array_name, resource_array_var)} }" %> }
     end
   end
 
-  # GET <%= example_controller_path %>/1
-  # GET <%= example_controller_path %>/1.json
+  # GET <%= example_show_path %>
+  # GET <%= example_show_path %>.json
   def show
     # <%= resource_var %> = <%= orm_class.find(resource_class, "params[:id]") %>
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render <%= key_value :json, "{ #{key_value(resource_table_name, resource_var)} }" %> }
+      format.json { render <%= key_value :json, "{ #{key_value(resource_name, resource_var)} }" %> }
     end
   end
 
-  # GET <%= example_controller_path %>/new
-  # GET <%= example_controller_path %>/new.json
+  # GET <%= example_index_path %>/new
+  # GET <%= example_index_path %>/new.json
   def new
     # <%= resource_var %> = <%= orm_class.build(resource_class) %>
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render <%= key_value :json, "{ #{key_value(resource_table_name, resource_var)} }" %> }
+      format.json { render <%= key_value :json, "{ #{key_value(resource_name, resource_var)} }" %> }
     end
   end
 
-  # GET <%= example_controller_path %>/1/edit
+  # GET <%= example_show_path %>/edit
   def edit
     # <%= resource_var %> = <%= orm_class.find(resource_class, "params[:id]") %>
   end
 
-  # POST <%= example_controller_path %>
-  # POST <%= example_controller_path %>.json
+  # POST <%= example_index_path %>
+  # POST <%= example_index_path %>.json
   def create
     # <%= resource_var %> = <%= orm_class.build(resource_class, "params[#{resource_symbol}]") %>
 
     respond_to do |format|
       if @<%= orm_instance.save %>
-        format.html { redirect_to <%= t_helper.controller_show_route(resource_var) %>, <%= key_value :notice, "'#{human_name} was successfully created.'" %> }
-        format.json { render <%= key_value :json, "{ #{key_value(resource_table_name, resource_var)} }" %>, <%= key_value :status, ':created' %>, <%= key_value :location, t_helper.controller_show_route(resource_var) %> }
+        format.html { redirect_to <%= t_helper.controller_show_route(resource_var) %>, <%= key_value :notice, "'#{resource_human_name} was successfully created.'" %> }
+        format.json { render <%= key_value :json, "{ #{key_value(resource_name, resource_var)} }" %>, <%= key_value :status, ':created' %>, <%= key_value :location, t_helper.controller_show_route(resource_var) %> }
       else
         format.html { render <%= key_value :action, '"new"' %> }
         format.json { render <%= key_value :json, "{ " + key_value('errors', "@#{orm_instance.errors}") + " }" %>, <%= key_value :status, ':unprocessable_entity' %> }
@@ -96,14 +105,14 @@ class <%= t_helper.controller_class_name %> < <%= t_helper.application_controlle
     end
   end
 
-  # PUT <%= example_controller_path %>/1
-  # PUT <%= example_controller_path %>/1.json
+  # PUT <%= example_show_path %>
+  # PUT <%= example_show_path %>.json
   def update
     # <%= resource_var %> = <%= orm_class.find(resource_class, "params[:id]") %>
 
     respond_to do |format|
       if @<%= orm_instance.update_attributes("params[#{resource_symbol}]") %>
-        format.html { redirect_to <%= t_helper.controller_show_route resource_var %>, <%= key_value :notice, "'#{human_name} was successfully updated.'" %> }
+        format.html { redirect_to <%= t_helper.controller_show_route resource_var %>, <%= key_value :notice, "'#{resource_human_name} was successfully updated.'" %> }
         format.json { head :no_content }
       else
         format.html { render <%= key_value :action, '"edit"' %> }
@@ -112,32 +121,48 @@ class <%= t_helper.controller_class_name %> < <%= t_helper.application_controlle
     end
   end
 
-  # DELETE <%= example_controller_path %>/1
-  # DELETE <%= example_controller_path %>/1.json
+  # DELETE <%= example_show_path %>
+  # DELETE <%= example_show_path %>.json
   def destroy
     # <%= resource_var %> = <%= orm_class.find(resource_class, "params[:id]") %>
     @<%= orm_instance.destroy %>
 
     respond_to do |format|
-      format.html { redirect_to <%= t_helper.controller_index_route %> }
+      format.html { redirect_to <%= t_helper.controller_index_route %>, <%= key_value :notice, "'#{resource_human_name} was successfully deleted.'" %> }
       format.json { head :no_content }
     end
   end
 
   protected
+<%- if t_helper.shallow_routes? -%>
+
+  def load_shallow_resources
+<%- reverse_parent_models = t_helper.parent_model_names.reverse -%>
+<%- reverse_parent_models.each_with_index do |parent_model, parent_index| -%>
+  <%- if parent_index == 0 -%>
+    if <%= resource_var %> && <%= resource_var %>.persisted?
+      <%= t_helper.parent_variable(parent_model) %> = <%= resource_var %>.<%= parent_model %> if <%= t_helper.parent_variable(parent_model) %>.nil?
+    end
+  <%- else -%>
+    if <%= t_helper.parent_variable(reverse_parent_models[parent_index-1]) %> && <%= t_helper.parent_variable(parent_model) %>.nil?
+      <%= t_helper.parent_variable(parent_model) %> = <%= t_helper.parent_variable(reverse_parent_models[parent_index-1]) %>.<%= parent_model %>
+    end
+  <%- end -%>
+<%- end -%>
+  end
+<%- end -%>
 
   # Capture any access violations, ensure User isn't unnessisarily redirected to root
   rescue_from CanCan::AccessDenied do |exception|
-    if params[:action] == 'index'
-      respond_to do |format|
-        format.html { redirect_to root_url, :alert => exception.message }
-        format.json { head :no_content, :status => :forbidden }
+    respond_to do |format|
+      format.html do
+        if params[:action] == 'index'<%= t_helper.parent_model_names.collect { |parent_model| " or #{t_helper.parent_variable(parent_model)}.nil?" }.join('') %>
+          redirect_to root_url, :alert => exception.message
+        else
+          redirect_to <%= t_helper.controller_index_route %>, :alert => exception.message
+        end
       end
-    else
-      respond_to do |format|
-        format.html { redirect_to <%= t_helper.controller_index_route %>, :alert => exception.message }
-        format.json { head :no_content, :status => :forbidden }
-      end
+      format.json { head :no_content, :status => :forbidden }
     end
   end
 

@@ -4,7 +4,7 @@ ProjectTemplates::Application.routes.draw do
 
   namespace :awesome do
     resources :users do
-      resources :foo_bars
+      resources :foo_bars, :shallow => true
     end
   end
 
